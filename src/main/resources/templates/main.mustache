@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>관광지 날씨 조회서비스</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <h3 class="m-4">관광코스별 관광지 상세 날씨 조회서비스</h3>
+      <div id="post-box"></div>
+    </div>
+  </body>
+
+  <script>
+    async function load() {
+      let response = await fetch("/api/weather", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      });
+      let responseParse = await response.json();
+      console.log(response);
+      console.log(responseParse.response.body.items.item[1]);
+      if (response.status === 200) {
+        alert("통신성공");
+        responseParse.response.body.items.item.forEach((post) => {
+          $("#post-box").append(postItemRender(post));
+        });
+      } else "통신실패";
+    }
+    function postItemRender(post) {
+      let courseName = post.courseName;
+      let courseAreaName = post.courseAreaName;
+      let spotAreaName = post.spotAreaName;
+      let spotName = post.spotName;
+      let tm = post.tm;
+      let sky = post.sky;
+      let rn = post.rn;
+      if (sky == 1) {
+        sky = "맑음";
+      } else if (sky == 2) {
+        sky = "구름";
+      } else if (sky == 3) {
+        sky = "흐림";
+      } else if (sky == 4) {
+        sky = "비";
+      } else if (sky == 5) {
+        sky = "소나기";
+      } else if (sky == 6) {
+        sky = "비눈";
+      } else if (sky == 7) {
+        sky = "눈비";
+      } else {
+        sky = "눈";
+      }
+      return `
+        <ul class="m-4 list-group" style="width: 500px;">
+            <li class="list-group-item" style="border-bottom: 0; font-weight: 700;">코스 명 : ${courseName}</li>
+            <li class="list-group-item" style="border-bottom: 0;">관광 지역 : ${courseAreaName} ${spotAreaName}</li>
+            <li class="list-group-item" style="border-bottom: 0;">관광지 명 : ${spotName}</li>
+            <li class="list-group-item" style="border-bottom: 0;">예보 시각 : ${tm}</li>
+            <li class="list-group-item" style="border-bottom: 0;">하늘 상태 : ${sky}</li>
+            <li class="list-group-item">강수량 : ${rn}</li>
+        </ul>
+        `;
+    }
+    load();
+  </script>
+</html>
